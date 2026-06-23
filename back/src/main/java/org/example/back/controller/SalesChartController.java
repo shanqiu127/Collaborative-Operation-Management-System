@@ -1,7 +1,6 @@
 package org.example.back.controller;
 
-import cn.dev33.satoken.annotation.SaCheckRole;
-import cn.dev33.satoken.annotation.SaMode;
+import org.example.back.common.annotation.RequireAdmin;
 import org.example.back.common.result.Result;
 import org.example.back.dto.SalesChartQueryDTO;
 import org.example.back.service.SalesChartService;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/business/charts")
-@SaCheckRole(value = {"admin", "superadmin"}, mode = SaMode.OR)
+@RequireAdmin("仅管理员可访问销售图表模块")
 public class SalesChartController {
 
     @Autowired
@@ -48,19 +47,16 @@ public class SalesChartController {
     }
 
     @GetMapping("/profit-overview")
-    @SaCheckRole("admin")
     public Result<ProfitOverviewVO> profitOverview(SalesChartQueryDTO queryDTO) {
         return Result.success(salesChartService.getProfitOverview(queryDTO));
     }
 
     @GetMapping("/profit-brand-top")
-    @SaCheckRole("admin")
     public Result<ProfitBrandTopVO> profitBrandTop(SalesChartQueryDTO queryDTO) {
         return Result.success(salesChartService.getProfitBrandTop(queryDTO));
     }
 
     @GetMapping("/profit-daily-trend")
-    @SaCheckRole("admin")
     public Result<ProfitTrendVO> profitDailyTrend(SalesChartQueryDTO queryDTO) {
         return Result.success(salesChartService.getProfitDailyTrend(queryDTO));
     }

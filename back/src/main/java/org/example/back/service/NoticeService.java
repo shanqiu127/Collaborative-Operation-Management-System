@@ -136,7 +136,7 @@ public class NoticeService {
     public void delete(Long id) {
         SysNotice notice = requireNotice(id);
         ensureCanManage(notice, authzService.currentUser());
-        sysNoticeMapper.physicalDeleteById(id);
+        sysNoticeMapper.deleteById(id);
     }
 
     private SysNotice requireNotice(Long id) {

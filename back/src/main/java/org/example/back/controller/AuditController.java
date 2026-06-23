@@ -1,5 +1,6 @@
 package org.example.back.controller;
 
+import org.example.back.common.annotation.RequireAdmin;
 import org.example.back.common.result.PageResult;
 import org.example.back.common.result.Result;
 import org.example.back.dto.LoginLogQueryDTO;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/system/audit")
+@RequireAdmin("仅管理员可访问审计日志模块")
 public class AuditController {
 
     @Autowired

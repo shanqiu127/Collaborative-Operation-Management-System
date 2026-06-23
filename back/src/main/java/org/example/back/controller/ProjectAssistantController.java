@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import org.example.back.common.annotation.RequireAdmin;
 import org.example.back.common.result.Result;
 import org.example.back.dto.ProjectAssistantQueryDTO;
 import org.example.back.service.AiConversationService;
@@ -88,12 +89,8 @@ public class ProjectAssistantController {
      * 重建知识库接口（仅 superadmin）
      */
     @PostMapping("/rebuild")
+    @RequireAdmin("仅超级管理员可重建知识库")
     public Result<Map<String, Object>> rebuild() {
-        // 权限校验：仅 superadmin 可操作
-        Object role = StpUtil.getSession().get("role");
-        if (role == null || !"superadmin".equals(role.toString().trim().toLowerCase())) {
-            return Result.fail(403, "仅超级管理员可重建知识库");
-        }
         Map<String, Object> status = knowledgeBaseService.rebuild();
         assistantService.buildSuggestions();
         return Result.success("知识库重建完成", status);

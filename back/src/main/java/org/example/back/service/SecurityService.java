@@ -9,7 +9,6 @@ import org.example.back.dto.IpPolicySaveDTO;
 import org.example.back.dto.LoginResponse;
 import org.example.back.entity.SysIpPolicy;
 import org.example.back.mapper.SysIpPolicyMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -51,21 +50,24 @@ public class SecurityService {
     public void create(IpPolicySaveDTO dto) {
         requireSuperAdmin();
         SysIpPolicy policy = new SysIpPolicy();
-        BeanUtils.copyProperties(dto, policy);
-        if (policy.getPriority() == null) {
-            policy.setPriority(100);
-        }
+        policy.setPolicyName(dto.getPolicyName());
+        policy.setIpCidr(dto.getIpCidr());
+        policy.setAllowFlag(dto.getAllowFlag());
+        policy.setStatus(dto.getStatus());
+        policy.setPriority(dto.getPriority() != null ? dto.getPriority() : 100);
+        policy.setRemark(dto.getRemark());
         sysIpPolicyMapper.insert(policy);
     }
 
     public void update(Long id, IpPolicySaveDTO dto) {
         requireSuperAdmin();
         SysIpPolicy existing = requirePolicy(id);
-        BeanUtils.copyProperties(dto, existing);
-        existing.setId(id);
-        if (existing.getPriority() == null) {
-            existing.setPriority(100);
-        }
+        // 逐字段赋值，避免 BeanUtils.copyProperties 覆盖受保护字段
+        existing.setPolicyName(dto.getPolicyName());
+        existing.setIpCidr(dto.getIpCidr());
+        existing.setAllowFlag(dto.getAllowFlag());
+        existing.setPriority(dto.getPriority() != null ? dto.getPriority() : 100);
+        existing.setRemark(dto.getRemark());
         sysIpPolicyMapper.updateById(existing);
     }
 

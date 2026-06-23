@@ -29,6 +29,8 @@ request.interceptors.response.use(
       if (window.location.pathname !== "/403") {
         window.location.href = "/403"
       }
+    } else {
+      ElMessage.error(error?.response?.data?.msg || "网络异常，请稍后重试")
     }
     return Promise.reject(error)
   }

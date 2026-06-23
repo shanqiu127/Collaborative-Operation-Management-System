@@ -292,7 +292,7 @@ public class PurchaseReturnService {
     private void increaseStock(Long goodsId, Integer quantity) {
         LambdaUpdateWrapper<BaseGoods> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(BaseGoods::getId, goodsId)
-                .setSql("stock = stock + " + quantity);
+                .setSql("stock = stock + {0}", quantity);
         int rows = baseGoodsMapper.update(null, wrapper);
         if (rows == 0) {
             throw BusinessException.validateFail("商品不存在");
@@ -303,7 +303,7 @@ public class PurchaseReturnService {
         LambdaUpdateWrapper<BaseGoods> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(BaseGoods::getId, goodsId)
                 .ge(BaseGoods::getStock, quantity)
-                .setSql("stock = stock - " + quantity);
+                .setSql("stock = stock - {0}", quantity);
         int rows = baseGoodsMapper.update(null, wrapper);
         if (rows == 0) {
             throw BusinessException.stockInsufficient(msg);

@@ -2,6 +2,7 @@ package org.example.back.controller;
 
 import jakarta.validation.Valid;
 import org.example.back.common.annotation.PreventDuplicateSubmit;
+import org.example.back.common.annotation.RequireAdmin;
 import org.example.back.common.result.PageResult;
 import org.example.back.common.result.Result;
 import org.example.back.dto.IpPolicyQueryDTO;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/system/security/ip-policies")
+@RequireAdmin("仅管理员可访问安全策略模块")
 public class SecurityController {
 
     @Autowired

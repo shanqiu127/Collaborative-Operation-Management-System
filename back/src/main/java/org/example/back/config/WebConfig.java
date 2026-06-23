@@ -1,12 +1,11 @@
 package org.example.back.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Web MVC 配置类
@@ -15,25 +14,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private LoginIpWhitelistInterceptor loginIpWhitelistInterceptor;
+    private final LoginIpWhitelistInterceptor loginIpWhitelistInterceptor;
+
+    /**
+     * CORS 允许的来源模式，逗号分隔。
+     * 开发环境默认 "*"（允许所有）；生产环境改为具体前端域名。
+     */
+    @Value("${app.cors.allowed-origin-patterns:*}")
+    private String[] corsAllowedOriginPatterns;
+
+    public WebConfig(LoginIpWhitelistInterceptor loginIpWhitelistInterceptor) {
+        this.loginIpWhitelistInterceptor = loginIpWhitelistInterceptor;
+    }
 
     /**
      * 配置 CORS 跨域
-     * 支持前端 Vite 的代理路径 /api 进行对齐
+     * 允许的来源模式通过 application.properties 中 app.cors.allowed-origin-patterns 配置
+     * 开发环境默认 "*"；生产环境应限定为具体前端域名
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                // 允许的源（开发环境允许所有源）
-                .allowedOriginPatterns("*")
-                // 允许的请求方法
+                .allowedOriginPatterns(corsAllowedOriginPatterns)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                // 允许的请求头
                 .allowedHeaders("*")
-                // 是否允许发送凭证（Cookie）
                 .allowCredentials(true)
-                // 预检请求的有效期（秒）
                 .maxAge(3600);
     }
 

@@ -11,6 +11,7 @@ import org.example.back.common.result.Result;
 import org.example.back.service.AuthService;
 import org.example.back.service.DeptService;
 import org.example.back.service.LoginLogService;
+import org.example.back.service.RegisterRateLimitService;
 import org.example.back.vo.OptionVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,9 @@ public class AuthController {
     @Autowired
     private DeptService deptService;
 
+    @Autowired
+    private RegisterRateLimitService registerRateLimitService;
+
     /**
      * 用户登录接口
      *
@@ -46,7 +50,7 @@ public class AuthController {
     @PreventDuplicateSubmit(intervalMs = 1500, message = "登录请求过于频繁，请稍后再试")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         String clientIp = ClientIpUtil.getClientIp(httpRequest);
-        String userAgent = httpRequest == null ? null : httpRequest.getHeader("User-Agent");
+        String userAgent = httpRequest.getHeader("User-Agent");
 
         try {
             LoginResponse response = authService.login(request);
@@ -69,7 +73,9 @@ public class AuthController {
      */
     @PostMapping("/register")
     @PreventDuplicateSubmit(intervalMs = 2000, message = "请勿重复提交注册请求")
-    public Result<Void> register(@Valid @RequestBody RegisterRequest request) {
+    public Result<Void> register(@Valid @RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
+        String clientIp = ClientIpUtil.getClientIp(httpRequest);
+        registerRateLimitService.check(clientIp);
         authService.register(request);
         return Result.success();
     }

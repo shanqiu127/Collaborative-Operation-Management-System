@@ -30,18 +30,7 @@ export default {
       const allowed = roleAllowed && deptAllowed
 
       if (!allowed) {
-        // 对可交互元素优先禁用并提示，其他元素再移除。
-        const tagName = (el.tagName || '').toUpperCase()
-        if (["BUTTON", "INPUT", "SELECT", "TEXTAREA"].includes(tagName) || el.className?.includes("el-button")) {
-          el.setAttribute('disabled', 'disabled')
-          el.setAttribute('aria-disabled', 'true')
-          el.style.pointerEvents = 'none'
-          el.style.opacity = '0.5'
-          if (!el.getAttribute('title')) {
-            el.setAttribute('title', '无权限操作')
-          }
-          return
-        }
+        // 统一移除 DOM 元素，避免通过 DevTools 取消 disabled 恢复操作
         el.parentNode && el.parentNode.removeChild(el)
       }
     }

@@ -215,6 +215,10 @@ router.beforeEach((to, from, next) => {
       return next()
     }
   } else {
+    // 已登录用户访问登录/注册页时重定向到首页
+    if (token) {
+      return next('/home')
+    }
     next()
   }
 })
