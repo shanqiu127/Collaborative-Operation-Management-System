@@ -60,7 +60,6 @@ public class DeptService {
 
     // 部门分页查询
     public PageResult<DeptVO> page(DeptQueryDTO queryDTO) {
-        cleanupExpiredRejectedDepts();
         requireDeptModuleAccess();
         LambdaQueryWrapper<SysDept> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(queryDTO.getDeptName()), SysDept::getDeptName, queryDTO.getDeptName())
@@ -75,7 +74,6 @@ public class DeptService {
     }
     // 部门选项列表
     public List<OptionVO> options() {
-        cleanupExpiredRejectedDepts();
         if (authzService.isAdmin() && !authzService.isDeptAdmin(AuthzService.DEPT_HR)) {
             SysDept currentDept = requireDept(authzService.currentDeptId());
             return List.of(new OptionVO(currentDept.getId(), currentDept.getDeptName()));
@@ -84,7 +82,6 @@ public class DeptService {
     }
 
     public List<OptionVO> publicOptions() {
-        cleanupExpiredRejectedDepts();
         LambdaQueryWrapper<SysDept> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysDept::getStatus, STATUS_APPROVED)
             .ne(SysDept::getDeptCode, AuthzService.DEPT_SYSTEM_MANAGEMENT)
@@ -95,14 +92,12 @@ public class DeptService {
     }
 
     public DeptVO getById(Long id) {
-        cleanupExpiredRejectedDepts();
         requireDeptModuleAccess();
         SysDept dept = requireDept(id);
         return toVO(dept);
     }
 
     public void create(DeptSaveDTO dto) {
-        cleanupExpiredRejectedDepts();
         authzService.requireDeptAdminOrSuperAdmin(AuthzService.DEPT_HR, "仅人事部门管理员可提交部门审批请求");
         LoginResponse.UserInfoVO requester = authzService.currentUser();
         SysDept dept = new SysDept();
@@ -116,7 +111,6 @@ public class DeptService {
     }
 
     public void update(Long id, DeptSaveDTO dto) {
-        cleanupExpiredRejectedDepts();
         requireDeptModuleAccess();
         SysDept dept = requireDept(id);
         assertDeptApproved(dept);
@@ -130,7 +124,6 @@ public class DeptService {
     }
 
     public void approve(Long id, ApprovalDecisionDTO dto) {
-        cleanupExpiredRejectedDepts();
         authzService.requireSuperAdmin("仅超级管理员可审批部门新增请求");
         LoginResponse.UserInfoVO approver = authzService.currentUser();
         SysDept dept = requireDept(id);
@@ -145,7 +138,6 @@ public class DeptService {
     }
 
     public void reject(Long id, ApprovalDecisionDTO dto) {
-        cleanupExpiredRejectedDepts();
         authzService.requireSuperAdmin("仅超级管理员可审批部门新增请求");
         LoginResponse.UserInfoVO approver = authzService.currentUser();
         SysDept dept = requireDept(id);
@@ -160,7 +152,6 @@ public class DeptService {
     }
 
     public void delete(Long id) {
-        cleanupExpiredRejectedDepts();
         authzService.requireSuperAdmin("仅超级管理员可删除部门");
         SysDept dept = requireDept(id);
         assertNotSystemManagementDept(dept, "系统管理部为系统预置部门，不允许删除");
